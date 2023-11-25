@@ -7,9 +7,9 @@ const PAGE = {
         //backgroundColors 卡片背景色
         backgroundColors: backgroundColors,
         //itemWidth 卡片宽度
-        itemWidth: 320 * (window.innerWidth / 1920),
+        itemWidth: 320,
         //itemHeight 卡片高度
-        itemHeight: 158 * (window.innerWidth / 1920),
+        itemHeight: 158,
         //paddingOffset 卡片移动距离边缘的距离
         paddingOffset: 20,
         //zIndex:  卡片层级
@@ -38,7 +38,7 @@ const PAGE = {
         submitBtn.addEventListener('click', this.getCardContent);
 
         let cardBoard = document.getElementById('card-board');
-        this.onEventListener(cardBoard, 'mousedown', 'card-item', this.handleMouseDown);
+        this.onEventListener(cardBoard, 'mousedown', 'card-mask', this.handleMouseDown);
 
         window.addEventListener('mousemove', this.handleMouseMove);
 
@@ -64,10 +64,18 @@ const PAGE = {
         let value = textareaInput.value;
         if (value == '') textareaInput.placeholder = '输入内容不能为空';
         else {
+            value = PAGE.truncateText(value);
             PAGE.addCard(value);
             textareaInput.value = '';
-            textareaInput.placeholder = '请输入内容';
+            textareaInput.placeholder = '请输入内容(不超过80个字)';
         }
+    },
+
+    truncateText: function(value) {
+        if(value.length > 80) {
+            value = value.substring(0, 79) + '...';
+        }
+        return value;
     },
 
     addCard: function (value) {
@@ -97,7 +105,8 @@ const PAGE = {
         cardItem.innerHTML = `<img class="card-bg-left" src="../image/message_bg_left.png">
                               <img class="card-bg-right" src="../image/message_bg_right.png">
                               <div class="card-title">小兔兔说：</div>
-                              <div class="card-txt">${value}</div>`
+                              <div class="card-txt">${value}</div>
+                              <div class="card-mask"></div>`
         cardBoard.appendChild(cardItem);
     },
 
@@ -107,7 +116,7 @@ const PAGE = {
 
     //鼠标点击存储数据并开锁
     handleMouseDown: function (e) {
-        let item = e.target;
+        let item = e.target.parentNode;
         item.style.zIndex = ++PAGE.data.zIndex;
         PAGE.data.item = item;
         PAGE.data.itemOffsetLeft = item.offsetLeft;
